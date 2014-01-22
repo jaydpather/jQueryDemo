@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    
+    <div class="container body-content" style="width: 1024px; min-width: 1024px;">
+
+        <div id="leftNav" class="leftNav">
+            <div id="leftNavAutoHide" style="float:right; text-align:right; padding-top: 3px; padding-right: 3px;">
+                <img id="imgPushPin" src="~/Content/pushpin.gif" style="border:solid 1px black; padding: 1px;" />
+            </div>
+            <div id="leftNavLinks" style="float:left; clear:right;">
+                <a href="~/Home/Index" id="lnlHome" class="leftNavItem leftNavSelectedItem">Home</a>
+                <a href="~/About/Index" id="lnlAbout" class="leftNavItem">About</a>
+                <a href="~/About/MissionStatement" id="lnlMissionStatement" class="leftNavSubItem">Mission Statement</a>
+                <a href="~/About/History" id="lnlHistory" class="leftNavSubItem">History</a>
+                <a href="~/Products/Index" id="lnlProducts" class="leftNavItem">Products</a>
+                <a href="~/Products/Household" id="lnlHousehold" class="leftNavSubItem">Household</a>
+                <a href="~/Products/Clothing" id="lnlClothing" class="leftNavSubItem">Clothing</a>
+            </div>
+            
+        </div>
+        <div style="float: left; padding-left: 15px; width: 640px;">
+            @RenderBody()
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/Scripts/jQueryRotate.js")
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+        var LEFTNAV_MIN_WIDTH = 15;
+        var LEFTNAV_MAX_WIDTH = 175;
+        var SS_LEFTNAV_IS_AUTOHIDE = "isLeftNavAutoHide"
+
+        $(document).ready(function () {
+            clearLeftNavHighlighting();
+            highlightCurrentPageInLeftNav();
+            
+            //the following if block is needed to maintain state between pages
+            //the leftnav could have been set to autohide, then the user could have clicked a leftnav link while in auto-hide mode.  if this happens, and we didn't have the following if block, we'd lose the autohide state.  (it would go back go default, false)
+            var isAutoHide = false; 
+            if ("true" === sessionStorage[SS_LEFTNAV_IS_AUTOHIDE]) { //sessionstorage vars always get converted to strings
+                isAutoHide = true; //note that we keep the default value of false if SessionStorage var is not set
+            }
+
+            setLeftNavAutoHide(isAutoHide, false);
+
+            $("#imgPushPin").click(imgPushPin_Click);
+        });
+
+        function imgPushPin_Click(event) {
+            if (!Modernizr.localstorage) {
+                alert('unsupported browser: you must use a browser that supports HTML5 storage (e.g., Internet Explorer 8.0+, FireFox 3.5+, Chrome 4.0+');
+                return;
+            }
+            //note that we don't call minimizeLeftNav() here. we don't want to minimize until the user mouses out
+            
+            var newAutohideValue = ("true" != sessionStorage[SS_LEFTNAV_IS_AUTOHIDE]);
+            setLeftNavAutoHide(newAutohideValue, true);
+            sessionStorage[SS_LEFTNAV_IS_AUTOHIDE] = newAutohideValue; //needed to maintain state between pages
+        }
+
+        function rotatePushPinIcon(isAutoHide, doAnimate) {
+            //rotate the image to reflect the new autohide state:
+            //before we can actually call the JQuery rotate func, we must determine which angle to rotate to.
+            var angle = 0;
+            var marginRight = 0; //when the image is rotated, it needs to be shifted by 4px in order to preserve the spacing between its right edge and the leftnav area's right edge
+            if (isAutoHide) {
+                angle = 90;
+                marginRight = 4;
+            }
+            var imgPushPin = $("#imgPushPin");
+            if (doAnimate) {
+                imgPushPin.rotate({ animateTo: angle });
+            }
+            else {
+                imgPushPin.rotate(angle);
+            }
+            
+            imgPushPin.css("margin-right", marginRight);
+        }
+
+        function setLeftNavAutoHideEvents(isAutoHide) {
+            if (isAutoHide) {
+                $("#leftNav").on("mouseenter", leftNav_MouseEnter);
+                $("#leftNav").on("mouseleave", leftNav_MouseOut);
+            }
+            else {
+                $("#leftNav").off("mouseenter", leftNav_MouseEnter);
+                $("#leftNav").off("mouseleave", leftNav_MouseOut);
+            }
+        }
+
+        function setLeftNavAutoHide(isAutoHide, doAnimate) {
+            rotatePushPinIcon(isAutoHide, doAnimate);
+            setLeftNavAutoHideEvents(isAutoHide);
+        }
+
+        function leftNav_MouseEnter(event) {
+            maximizeLeftNav();
+        }
+
+        function leftNav_MouseOut(event) {
+            minimizeLeftNav();
+        }
+
+        function maximizeLeftNav() {
+            //$("#leftNav").css("width", ""); //width will default back to the width specified in the leftNav CSS class
+            $("#leftNav").animate({ 'width': LEFTNAV_MAX_WIDTH + 'px' });
+            $("#leftNavAutoHide").show();
+            $("#leftNavLinks").show();
+        }
+
+        function minimizeLeftNav() {
+            $("#leftNavAutoHide").hide();
+            $("#leftNavLinks").hide();
+            $("#leftNav").animate({ 'width': LEFTNAV_MIN_WIDTH + 'px' });
+        }
+
+        function highlightCurrentPageInLeftNav() {
+            $('a[href="' + $(location).attr('pathname') + '"]').addClass("leftNavSelectedItem");
+        }
+
+        function clearLeftNavHighlighting() {
+            $(".leftNavItem").removeClass("leftNavSelectedItem");
+            $(".leftNavSubItem").removeClass("leftNavSelectedItem");
+        }
+
+    </script>
+</body>
+</html>

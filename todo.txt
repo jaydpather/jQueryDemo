@@ -1,0 +1,17 @@
+DONE fix <hr> tag on index page.  (not clearing left)
+DONEimplement views for each page.  (page title and lorem ipsum)
+X implement maxwidth for content area once lorem ipsum is done
+DONE add URLs for each left nav link
+X add URL onclick event to change leftnav link class
+DONE	working, BUT: navigating to the next page undoes the css changes made by jquery calls
+DONE implement pushpin onclick: minimize leftnav bar (make sure content area slides accordingly)
+DONE implement mouseover that will maximize leftnav bar (in minimized state), keep it maximized in maximized-autohide state, and minimize on mouse leave in autohide state
+DONE Need to find a way to maintain min/max state when the user navigates to a new page
+DONE clicking pushpin shouldn't minimize leftnav until you mouse away
+DONE pushpin should be horizontal in maximised-autohide state
+DONE modify pushpin onclick: turn off autohide state.  rotate back to normal
+		need to figure out how to remove an event handler for this.  (need to remove mouseover events)
+		need to modify Ready event to remove leftnav hover events if needed, and rotate pushpin icon if needed (refactor code for add/remove leftnav events into their own method)
+DONE add animation to minimize/maximize so it doesn't "jump" so harshly
+DONE modify homepage text to explain the app.  (maybe do this on all pages?)
+DONE test in all browsers
